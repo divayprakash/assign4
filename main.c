@@ -4,79 +4,63 @@
 //********************************//
 
 //**********LCD Functions**********//
-#define	lcd_Clear 0b00000001
+#define	clearLCD 0b00000001
 //Clear Display and Home the Cursor
-#define	lcd_Home 0b00000010
+#define	returnToHomeLCD 0b00000010
 //Return Cursor and LCD to Home Position
-#define	lcd_EntryMode 0b00000110
+#define	setCursorMoveDirectionLCD 0b00000110
 //Set Cursor Move Direction
-#define	lcd_DisplayOff 0b00001000
+#define	turnOffLCD 0b00001000
 //Turn off LCD
-#define	lcd_DisplayOn 0b00001100
+#define	turnOnLCD 0b00001100
 //Turn on LCD
-#define	lcd_FunctionReset 0b00110000
-#define	lcd_FunctionSet4bit 0b00101000
+#define	resetLCD 0b00110000
+//Reset LCD
+#define	bitMode4LCD 0b00101000
+//Set LCD to 4bit mode
 //*********************************//
 
 //**********Function Prototypes**********//
-void lcd_init (void );
-void lcd_write_string (uint8_t *);
-void lcd_write_character (uint8_t );
-void lcd_write_instruction (uint8_t );
-void lcd_write (uint8_t );
-void lcd_set_4bit();
-void lcd_reset();
+void initializeLCD (void );
+void writeStringLCD (uint8_t *);
+void writeCharLCD (uint8_t );
+void writeInstructionLCD (uint8_t );
+void writeToLCD (uint8_t );
+void set4bitModeLCD();
+void funcResetLCD();
 //***************************************//
 
-//**********Names**********//
+//**********Names to display**********//
 uint8_t name1[] = "Divay Prakash";
 uint8_t name2[] = "Sahil Ruhela";
-//*************************//
-
-//**********Print names**********//
-void print_names()
-{
-	lcd_write_instruction (lcd_Home);
-	_delay_ms(4);
-	lcd_write_instruction (lcd_Clear);
-	_delay_ms(4);
-	lcd_write_string (name1);
-	_delay_ms(2000);
-	lcd_write_instruction (lcd_Home);
-	_delay_ms(4);
-	lcd_write_instruction (lcd_Clear);
-	_delay_ms(4);
-	lcd_write_string (name2);
-	_delay_ms(2000);
-}
-//*******************************//
+//************************************//
 
 //**********Reset LCD**********//
-void lcd_reset()
+void funcResetLCD()
 {
-	lcd_write_instruction (lcd_FunctionReset);	//2
-	_delay_ms(10);								//3
-	lcd_write_instruction (lcd_FunctionReset);	//4
-	_delay_us(200);								//5
-	lcd_write_instruction (lcd_FunctionReset);	//6
-	_delay_us(200);								//7
+	writeInstructionLCD(resetLCD);	//2
+	_delay_ms(10);					//3
+	writeInstructionLCD(resetLCD);	//4
+	_delay_us(200);					//5
+	writeInstructionLCD(resetLCD);	//6
+	_delay_us(200);					//7
 }
 //*****************************//
 
 //**********Set LCD to 4-bit mode**********//
-void lcd_set_4bit()
+void set4bitModeLCD()
 {
-	lcd_write_instruction (lcd_FunctionSet4bit);	
+	writeInstructionLCD(bitMode4LCD);	
 	// Set 4bit mode		
-	_delay_us (80);				
-	lcd_write_instruction (lcd_FunctionSet4bit);			
+	_delay_us(80);				
+	writeInstructionLCD(bitMode4LCD);			
 	// Set Interface Length
-	_delay_us (80);		
+	_delay_us(80);		
 }
 //*****************************************//
 
 //**********Function to initialize LCD**********//
-void lcd_init (void )
+void initializeLCD()
 {
 	_delay_ms(100);						
 	//Power on delay		
@@ -84,55 +68,73 @@ void lcd_init (void )
 	//set RS 0
 	PORTB &= 0b11111101;						
 	//set EN 0
-	lcd_reset();
+	funcResetLCD();
 	//reset LCD
-	lcd_set_4bit();
+	set4bitModeLCD();
 	//set LCD to 4 bit
-	lcd_write_instruction (lcd_DisplayOff);				
-	// Turn Display Off
-	_delay_ms (80);
-	lcd_write_instruction (lcd_Clear);				
-	// Clear Display RAM
-	_delay_ms (4);
-	lcd_write_instruction (lcd_EntryMode);				
-	// Set Shift Characteristics
-	_delay_us (80);
-	lcd_write_instruction (lcd_DisplayOn);				
-	// Turn Display Back On
-	_delay_us (80);
+	writeInstructionLCD(turnOffLCD);				
+	//Turn Display Off
+	_delay_ms(80);
+	writeInstructionLCD(clearLCD);				
+	//Clear Display RAM
+	_delay_ms(4);
+	writeInstructionLCD(setCursorMoveDirectionLCD);				
+	//Set Shift
+	_delay_us(80);
+	writeInstructionLCD(turnOnLCD);				
+	//Turn Display On
+	_delay_us(80);
 }
 //**********************************************//
-	
+
+//**********Print names**********//
+void print_names()
+{
+	writeInstructionLCD(returnToHomeLCD);
+	_delay_ms(4);
+	writeInstructionLCD(clearLCD);
+	_delay_ms(4);
+	writeStringLCD(name1);
+	_delay_ms(2000);
+	writeInstructionLCD(returnToHomeLCD);
+	_delay_ms(4);
+	writeInstructionLCD(clearLCD);
+	_delay_ms(4);
+	writeStringLCD(name2);
+	_delay_ms(2000);
+}
+//*******************************//
+
 //**********Write a string to LCD**********//
-void lcd_write_string (uint8_t theString[])
+void writeStringLCD(uint8_t s[])
 {
 	volatile int i = 0;
-	while (theString[i] != 0)
+	while (s[i] != 0)
 	{
-		lcd_write_character (theString[i]);
-		i ++;
+		writeCharLCD(s[i]);
+		i++;
 		_delay_us(80);					
 	}
 }
 //*****************************************//
 
 //**********Write a char to LCD**********//
-void lcd_write_character (uint8_t theData)
+void writeCharLCD(uint8_t c)
 {
 	PORTB |= 0b00000001;
 	PORTB &= 0b11111101;						
-	lcd_write (theData);
-	lcd_write (theData << 4);
+	writeToLCD(c);
+	writeToLCD(c << 4);
 }
 //***************************************//
 
 //**********Write instruction to LCD**********//
-void lcd_write_instruction (uint8_t theInstruction)
+void writeInstructionLCD(uint8_t i)
 {
 	PORTB &= 0b11111110;						
 	PORTB &= 0b11111101;						
-	lcd_write (theInstruction);
-	lcd_write (theInstruction << 4);
+	writeToLCD(i);
+	writeToLCD(i << 4);
 }
 //********************************************//
 
@@ -147,23 +149,19 @@ void pulse_enable()
 //********************************//
 
 //**********Write byte to lcd**********//
-void lcd_write (uint8_t theByte)
+void writeToLCD(uint8_t b)
 {
 	PORTD &= 0b01111111;						
-	if (theByte & 1 << 7)						
-		PORTD |= 0b10000000;					
+	if (b & 1 << 7)	PORTD |= 0b10000000;					
 	PORTD &= 0b10111111;						
-	if (theByte & 1 << 6)						
-		PORTD |= 0b01000000;					
+	if (b & 1 << 6)	PORTD |= 0b01000000;					
 	PORTD &= 0b11011111;						
-	if (theByte & 1 << 5)						
-		PORTD |= 0b00100000;					
+	if (b & 1 << 5)	PORTD |= 0b00100000;					
 	PORTD &= 0b11101111;						
-	if (theByte & 1 << 4)						
-		PORTD |= 0b00010000;					
+	if (b & 1 << 4)	PORTD |= 0b00010000;					
 	pulse_enable();
 }
-//*************************************//
+//************************************//
 
 //**********Main function**********//
 int main(void)
@@ -172,7 +170,7 @@ int main(void)
 	// Pins 14-11 on LCD (D7-4) to PORTD7-4 on ATMega328 (pin 7-4 on Arduino)
 	DDRB |= 0b00000011;
 	// RS and EN on LCD (4, 6) to PORTB1,0 on ATMega328 (pin 9,8 on Arduino)
-	lcd_init ();							
+	initializeLCD();							
 	while (1) print_names();		
 	return 0;
 }
