@@ -1,7 +1,19 @@
 //**********Header files**********//
-#include <avr/io.h>
 #include <util/delay.h>
 //********************************//
+
+//**********Macro declarations**********//
+#define _MMIO_BYTE(mem_addr) (*(volatile uint8_t *)(mem_addr))
+#define _SFR_IO8(io_addr) _MMIO_BYTE((io_addr) + __SFR_OFFSET)
+#define __SFR_OFFSET 0x20
+//**************************************//
+
+//**********Register Declarations**********//
+#define DDRB _SFR_IO8(0x04)
+#define PORTB _SFR_IO8(0x05)
+#define DDRD _SFR_IO8(0x0A)
+#define PORTD _SFR_IO8(0x0B)
+//*****************************************//
 
 //**********LCD Functions**********//
 #define	clearLCD 0b00000001
@@ -111,8 +123,7 @@ void writeStringLCD(uint8_t s[])
 	volatile int i = 0;
 	while (s[i] != 0)
 	{
-		writeCharLCD(s[i]);
-		i++;
+		writeCharLCD(s[i++]);
 		_delay_us(80);					
 	}
 }
