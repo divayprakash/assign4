@@ -1,14 +1,12 @@
 //**********Header files**********//
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <stdint.h>
 //********************************//
 
 //**********Macro declarations**********//
 #define _MMIO_BYTE(mem_addr) (*(volatile uint8_t *)(mem_addr))
 #define _SFR_IO8(io_addr) _MMIO_BYTE((io_addr) + __SFR_OFFSET)
 #define __SFR_OFFSET 0x20
-
 #define _MMIO_WORD(mem_addr) (*(volatile uint16_t *)(mem_addr))
 #define _SFR_MEM8(mem_addr) _MMIO_BYTE(mem_addr)
 #define _SFR_MEM16(mem_addr) _MMIO_WORD(mem_addr)
@@ -19,18 +17,15 @@
 #define PORTB _SFR_IO8(0x05)
 #define DDRD _SFR_IO8(0x0A)
 #define PORTD _SFR_IO8(0x0B)
-
 #define TCCR1A _SFR_MEM8(0x80)
 #define WGM10 0
 #define WGM11 1
-
 #define TCCR1B _SFR_MEM8(0x81)
 #define CS10 0
 #define CS11 1
 #define CS12 2
 #define WGM12 3
 #define WGM13 4
-
 #define TCNT1 _SFR_MEM16(0x84)
 #define OCR1A _SFR_MEM16(0x88)
 #define TIMSK1 _SFR_MEM8(0x6F)
@@ -73,19 +68,19 @@ void setup_delay();
 void setup_delay() 
 {
 	TCCR1A = 0;
-	// set entire TCCR1A register to 0
+	//set entire TCCR1A register to 0
   	TCCR1B = 0;
-  	// same for TCCR1B
+  	//same for TCCR1B
   	TCNT1  = 0;
   	//initialize counter value to 0
-  	// set compare match register for 1hz increments
+  	//set compare match register for 1hz increments
   	OCR1A = 31249;
-  	// = (16*10^6) / (2*1024) - 1 (must be <65536)
+  	//= ((16*10^6) / (0.5*1024)) - 1 (must be <65536)
   	// turn on CTC mode
   	TCCR1B |= (1 << WGM12);
-  	// Set CS10 and CS12 bits for 1024 prescaler
+  	//Set CS10 and CS12 bits for 1024 prescaler
   	TCCR1B |= (1 << CS12) | (1 << CS10);  
-  	// enable timer compare interrupt
+  	//enable timer compare interrupt
   	TIMSK1 |= (1 << OCIE1A);
 }
 //*******************************************//
@@ -111,10 +106,10 @@ void funcResetLCD()
 void set4bitModeLCD()
 {
 	writeInstructionLCD(bitMode4LCD);	
-	// Set 4bit mode		
+	//Set 4bit mode		
 	_delay_us(80);				
 	writeInstructionLCD(bitMode4LCD);			
-	// Set Interface Length
+	//Set Interface Length
 	_delay_us(80);		
 }
 //*****************************************//
@@ -171,7 +166,7 @@ ISR(TIMER1_COMPA_vect)
 		flag = 0;
 	}
 	TCNT1 = 0;
-  // Reset Timer1 Count Register
+  	//Reset Timer1 Count Register
 }
 //************************************************************//
 
