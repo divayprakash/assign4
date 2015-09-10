@@ -17,6 +17,14 @@
 #define PORTB _SFR_IO8(0x05)
 #define DDRD _SFR_IO8(0x0A)
 #define PORTD _SFR_IO8(0x0B)
+#define PORTD0 0
+#define PORTD1 1
+#define PORTD2 2
+#define PORTD3 3
+#define PORTD4 4
+#define PORTD5 5
+#define PORTD6 6
+#define PORTD7 7
 #define TCCR1A _SFR_MEM8(0x80)
 #define WGM10 0
 #define WGM11 1
@@ -215,6 +223,11 @@ void pulse_enable()
 //**********Write byte to lcd**********//
 void writeToLCD(uint8_t b)
 {
+	PORTD = (b >> 7) & 1;
+	PORTD = (b >> 6) & 1;
+	PORTD = (b >> 5) & 1;
+	PORTD = (b >> 4) & 1;
+	/*
 	PORTD &= 0b01111111;						
 	if (b & 1 << 7)	PORTD |= 0b10000000;					
 	PORTD &= 0b10111111;						
@@ -223,6 +236,7 @@ void writeToLCD(uint8_t b)
 	if (b & 1 << 5)	PORTD |= 0b00100000;					
 	PORTD &= 0b11101111;						
 	if (b & 1 << 4)	PORTD |= 0b00010000;					
+	*/
 	pulse_enable();
 }
 //************************************//
